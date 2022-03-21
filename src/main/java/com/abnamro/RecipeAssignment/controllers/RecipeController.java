@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.abnamro.RecipeAssignment.model.Recipe;
 import com.abnamro.RecipeAssignment.repository.RecipeRepository;
+import com.abnamro.RecipeAssignment.service.RecipeInterface;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -29,65 +30,53 @@ import com.abnamro.RecipeAssignment.repository.RecipeRepository;
 public class RecipeController {
 	@Autowired
 	public RecipeRepository recipeRepository;
-
-	@GetMapping("/Recipes/getAllRecipes/")
+	
+	//Interfaceobject creation
+	@Autowired
+	public RecipeInterface recipeInterface;
+	
+	//To get all recipes present
+	@GetMapping("/Recipes/dishes-list/")
 	public ResponseEntity<List<Recipe>> getAllRecipes(@RequestParam(required = false) String dishname) {
 		try {
-			List<Recipe> Recipes = new ArrayList<Recipe>();
-			if (dishname == null)
-				recipeRepository.findAll().forEach(Recipes::add);
-			else
-				recipeRepository.findBydishname(dishname).forEach(Recipes::add);
-			if (Recipes.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
-			return new ResponseEntity<>(Recipes, HttpStatus.OK);
+			return recipeInterface.getAllRecipes(dishname);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@GetMapping("/Recipes/getRecipebyID/")
-	public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") long id) {
-		Optional<Recipe> RecipeData = recipeRepository.findById(id);
-		if (RecipeData.isPresent()) {
-			return new ResponseEntity<>(RecipeData.get(), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	
+	//To find a recipe by their Id
+	@GetMapping("/Recipes/dish-byId/")
+	public ResponseEntity<Recipe> getRecipeById(@PathVariable("id") long id)  {
+	try {
+		return recipeInterface.getRecipeById(id);
+	} catch (Exception e) {
+		return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-
-	@PostMapping("/Recipes/addNewRecipe/")
+		}
+	//To add a new recipe
+	@PostMapping("/Recipes/new-dish/")
 	public ResponseEntity<Recipe> createRecipe(@RequestBody String recipe1) {
 		try {
-			Gson gson = new Gson();
-			Recipe recipe = gson.fromJson(recipe1, Recipe.class);
-			Recipe create = recipeRepository.save(new Recipe(recipe.getId(), recipe.getTime(), recipe.getDishname(),
-					recipe.getDishtype(), recipe.getServes(), recipe.getIngredients()));
-			return new ResponseEntity<>(create, HttpStatus.CREATED);
+			return recipeInterface.createRecipe(recipe1);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-
-	@PutMapping("/Recipes/updateRecipe/")
+	//To update a existing recipe
+	@PutMapping("/Recipes/Update-Dish/")
 	public ResponseEntity<Recipe> updateRecipe(@RequestBody String recipe2) {
 		try {
-			Gson gson = new Gson();
-			Recipe recipe = gson.fromJson(recipe2, Recipe.class);
-			Recipe update = recipeRepository.save(new Recipe(recipe.getId(), recipe.getTime(), recipe.getDishname(),
-					recipe.getDishtype(), recipe.getServes(), recipe.getIngredients()));
-			return new ResponseEntity<>(update, HttpStatus.OK);
+			return recipeInterface.updateRecipe(recipe2);
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
 		}
 	}
-
-	@DeleteMapping("/Recipes/deleteRecipeByID/")
+	//To delete a recipe with using their ID
+	@DeleteMapping("/Recipes/delete-dish-recipe-ID/")
 	public ResponseEntity<HttpStatus> deleteRecipe(@PathVariable("id") long id) {
 		try {
-			recipeRepository.deleteById(id);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			return recipeInterface.deleteRecipe(id);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

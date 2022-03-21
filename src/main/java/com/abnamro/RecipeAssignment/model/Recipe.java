@@ -8,9 +8,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+
+//Table and entity declaration
 @Entity
 @Table(name = "Recipes")
 public class Recipe {
+	//Coloumns in table 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
@@ -24,18 +27,17 @@ public class Recipe {
 	private String serves;
 	@Column(name = "ingredients")
 	private String ingredients;
-
+	//Constructors
 	public Recipe(long id, String time, String dishname, String dishtype, String serves, String ingredients) {
 		super();
 		this.id = id;
 		this.time = LocalTime.now().toString();
 		this.dishname = dishname;
 		this.dishtype = dishtype;
-
 		this.serves = serves;
 		this.ingredients = ingredients;
 	}
-
+	
 	public String getIngredients() {
 		return ingredients;
 	}
@@ -48,9 +50,8 @@ public class Recipe {
 		this.dishname = dishname;
 		this.dishtype = dishtype;
 	}
-
+	//Getters and setters
 	public Recipe() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public long getId() {
